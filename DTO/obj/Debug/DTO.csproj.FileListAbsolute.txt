@@ -1,0 +1,6 @@
+C:\BTL_W\DTO\bin\Debug\DTO.dll
+C:\BTL_W\DTO\bin\Debug\DTO.pdb
+C:\BTL_W\DTO\obj\Debug\DTO.csproj.AssemblyReference.cache
+C:\BTL_W\DTO\obj\Debug\DTO.csproj.CoreCompileInputs.cache
+C:\BTL_W\DTO\obj\Debug\DTO.dll
+C:\BTL_W\DTO\obj\Debug\DTO.pdb
