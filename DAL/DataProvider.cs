@@ -14,7 +14,7 @@ namespace DAL
         public static SqlConnection Openconnect()
         {
             string sChuoiKetNoi = @"Data Source=DESKTOP-FA34S7I\SQLEXPRESS;Initial Catalog=WatchStore;Integrated Security=True;TrustServerCertificate=True";
-           //  string sChuoiKetNoi = @"Data Source=DESKTOP-FA34S7I\SQLEXPRESS;Initial Catalog=TOYSTOREPOS;Integrated Security=True;Encrypt=True;TrustServerCertificate=True";
+         
             SqlConnection con = new SqlConnection(sChuoiKetNoi);
             con.Open();
             return con;
@@ -40,6 +40,20 @@ namespace DAL
                 return -1;
             }
         }
+
+        public static int JustExcuteWithParameter(string sql, params SqlParameter[] parameters)
+        {
+            using (SqlConnection connection = new SqlConnection(sql))
+            {
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddRange(parameters);
+                    connection.Open();
+                    return command.ExecuteNonQuery();
+                }
+            }
+        }
+
         public static DataTable GetTable(string sql)
         {
             SqlConnection con = Openconnect();
