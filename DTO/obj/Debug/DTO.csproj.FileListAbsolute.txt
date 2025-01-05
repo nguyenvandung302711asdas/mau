@@ -4,3 +4,16 @@ C:\BTL_W\DTO\obj\Debug\DTO.csproj.AssemblyReference.cache
 C:\BTL_W\DTO\obj\Debug\DTO.csproj.CoreCompileInputs.cache
 C:\BTL_W\DTO\obj\Debug\DTO.dll
 C:\BTL_W\DTO\obj\Debug\DTO.pdb
+C:\BTL_W\DTO\bin\Debug\Microsoft.ReportViewer.WinForms.dll
+C:\BTL_W\DTO\obj\Debug\DTO.csproj.Up2Date
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Common.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Dns.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Groupware.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Imap4.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Mail.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Nntp.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.OpenPGP.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Pop3.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.Smtp.dll
+C:\BTL_W\DTO\bin\Debug\ActiveUp.Net.WhoIs.dll
+C:\BTL_W\DTO\bin\Debug\System.Net.Mail.Abstractions.dll

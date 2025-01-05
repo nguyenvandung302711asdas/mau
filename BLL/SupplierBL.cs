@@ -46,5 +46,13 @@ namespace BLL
         {
             return SupplierDL.GetInstance.NgungHopTacNCC(MANCC);
         }
+
+
+
+        //khanh -----------------------------------
+        public DataTable GetDanhSachNCC()
+        {
+            return SupplierDL.GetInstance.GetDanhSachNCC();
+        }
     }
 }

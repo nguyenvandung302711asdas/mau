@@ -7,3 +7,15 @@ C:\BTL_W\DAL\bin\Debug\DTO.pdb
 C:\BTL_W\DAL\obj\Debug\DAL.csproj.Up2Date
 C:\BTL_W\DAL\obj\Debug\DAL.dll
 C:\BTL_W\DAL\obj\Debug\DAL.pdb
+C:\BTL_W\DAL\bin\Debug\Microsoft.ReportViewer.WinForms.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Common.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Dns.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Groupware.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Imap4.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Mail.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Nntp.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.OpenPGP.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Pop3.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.Smtp.dll
+C:\BTL_W\DAL\bin\Debug\ActiveUp.Net.WhoIs.dll
+C:\BTL_W\DAL\bin\Debug\System.Net.Mail.Abstractions.dll

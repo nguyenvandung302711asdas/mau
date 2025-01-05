@@ -14,11 +14,12 @@ namespace DAL
         public static SqlConnection Openconnect()
         {
             string sChuoiKetNoi = @"Data Source=DESKTOP-FA34S7I\SQLEXPRESS;Initial Catalog=WatchStore;Integrated Security=True;TrustServerCertificate=True";
-         
+
             SqlConnection con = new SqlConnection(sChuoiKetNoi);
             con.Open();
             return con;
         }
+
         public static void Disconnect(SqlConnection con)
         {
             con.Close();
@@ -62,6 +63,84 @@ namespace DAL
             da.Fill(dt);
             Disconnect(con);
             return dt;
+        }
+
+        public static DataTable GetTable1(string sql, SqlParameter[] parameters = null)
+        {
+            SqlConnection con = null;
+            try
+            {
+                con = Openconnect();
+                SqlCommand cmd = new SqlCommand(sql, con);
+
+                if (parameters != null)
+                {
+                    cmd.Parameters.AddRange(parameters);
+                }
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi thực thi GetTable: {ex.Message}");
+                return null;
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    Disconnect(con);
+                }
+            }
+        }
+
+
+        public static object ExecuteScalar(string sql, SqlParameter[] parameters)
+        {
+            string connectionString = @"Data Source=DESKTOP-FA34S7I\SQLEXPRESS;Initial Catalog=WatchStore;Integrated Security=True;TrustServerCertificate=True";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))  // connectionString là chuỗi kết nối của bạn
+            {
+                try
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand(sql, conn))
+                    {
+                        // Thêm tham số vào câu lệnh SQL
+                        cmd.Parameters.AddRange(parameters);
+
+                        // Thực thi câu lệnh và trả về giá trị scalar (đơn)
+                        return cmd.ExecuteScalar();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Lỗi khi thực thi câu lệnh SQL: " + ex.Message);
+                    return null;
+                }
+            }
+
+        }
+
+        public static DataTable GetTableWithParameters(string sql, SqlParameter[] parameters)
+        {
+            string connectionString = @"Data Source=DESKTOP-FA34S7I\SQLEXPRESS;Initial Catalog=WatchStore;Integrated Security=True;TrustServerCertificate=True";
+
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(sql, con))
+                {
+                    cmd.Parameters.AddRange(parameters);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    return dt;
+                }
+            }
         }
     }
 }

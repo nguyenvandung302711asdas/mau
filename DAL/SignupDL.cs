@@ -10,6 +10,8 @@ namespace DAL
 {
     public class SignupDL
     {
+        public static string ReceivedData_id { get; set; }
+
 
         private static SignupDL Instance;
         public static SignupDL GetInstance
@@ -67,6 +69,31 @@ namespace DAL
 
                 conn.Open();
                 return (string)cmd.ExecuteScalar();
+            }
+        }
+        // Lấy  của người dùng
+        public string GETid(string name)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT AdminID FROM Admin WHERE AdminName = @username";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@username", name);
+
+                conn.Open();
+
+                // ExecuteScalar() trả về giá trị của cột đầu tiên trong dòng đầu tiên, hoặc null nếu không có kết quả
+                var result = cmd.ExecuteScalar();
+
+                // Kiểm tra nếu result không phải là null và trả về giá trị AdminID dưới dạng chuỗi
+                if (result != DBNull.Value && result != null)
+                {
+                    return result.ToString();  // Trả về AdminID dưới dạng chuỗi
+                }
+                else
+                {
+                    return null;  // Trả về null nếu không tìm thấy AdminID
+                }
             }
         }
 

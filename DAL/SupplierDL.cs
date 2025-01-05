@@ -153,5 +153,24 @@ namespace DAL
             }
         }
         #endregion
+
+
+        #region Lấy Danh Sách NCC Cua tao
+        public DataTable GetDanhSachNCC()
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+                string sql = "SELECT SupplierId ,[ContactName] ,Address AS N'Địa Chỉ NCC',Phone AS N'SĐT',Email AS 'Email' FROM Supplier where [NGUNGHOPTAC] = 1";
+                dt = DataProvider.GetTable(sql);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show("Lỗi database: " + ex.Message);
+                return null;
+            }
+        }
+        #endregion
     }
 }

@@ -9,3 +9,15 @@ C:\BTL_W\BLL\bin\Debug\DTO.pdb
 C:\BTL_W\BLL\obj\Debug\BLL.csproj.Up2Date
 C:\BTL_W\BLL\obj\Debug\BLL.dll
 C:\BTL_W\BLL\obj\Debug\BLL.pdb
+C:\BTL_W\BLL\bin\Debug\Microsoft.ReportViewer.WinForms.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Common.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Dns.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Groupware.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Imap4.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Mail.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Nntp.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.OpenPGP.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Pop3.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Smtp.dll
+C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.WhoIs.dll
+C:\BTL_W\BLL\bin\Debug\System.Net.Mail.Abstractions.dll

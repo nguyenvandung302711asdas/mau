@@ -39,6 +39,12 @@ namespace BLL
         {
             return SignupDL.GetInstance.GetName(username);
         }
+
+        // Lấy ten người dùng
+        public string Getid(string username)
+        {
+            return SignupDL.GetInstance.GETid(username);
+        }
         // Doi mat khau
         public bool DoiMatKhau(string username, string newPassword)
         {
