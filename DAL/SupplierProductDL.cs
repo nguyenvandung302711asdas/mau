@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 
 namespace DAL
@@ -29,37 +30,36 @@ namespace DAL
             }
         }
 
+
         #region Lấy Danh sách sản phẩm trong kho
         public DataTable GetProductInStock()
         {
             try
             {
                 string sql = @"
-                  SELECT
-                  ProductID,
-                  SupplierProduct.SupplierID as 'supId',
-                  SupplierProduct.CategoryID as 'cateId',
-                  SupplierProduct.BrandID as 'brId',                    
-                  br.BrandName as 'brName',
-                   sp.SupplierName as 'supName',
-                   cg.CategoryName as 'cateName',
-                   ProductName,
-                   Price,
-                   Status,
-                   Quantity,
-                   SupplierProduct.CreatedAt,
-                   Img
-                FROM SupplierProduct
-                  join [dbo].[Brand] as br on br.BrandID = SupplierProduct.BrandID
-                  join [dbo].[Supplier] as sp on sp.SupplierID = SupplierProduct.SupplierID
-                  join [dbo].[Category] as cg on cg.CategoryID = SupplierProduct.CategoryID";
+                
+                SELECT
+                    ProductID,
+                    SupplierID,
+                    ProductName,
+                    Price,
+                    Status,
+                    Quantity,
+                    CreatedAt,
+                    Img,
+                    CategoryID,
+                    BrandID
+                 FROM SupplierProduct "
+;
+
+
                 DataTable dt = new DataTable();
                 dt = DataProvider.GetTable(sql);
                 return dt;
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Lỗi database: " + ex.Message);
+                //MessasgeBox.Show("Lỗi database: " + ex.Message);
                 return null;
             }
         }
@@ -86,35 +86,81 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                //   MessageBox.Show("Lỗi database: " + ex.Message);
+
                 return null;
             }
         }
         #endregion
 
-        // Thêm sản phẩm mới vào bảng Product
-        public int AddProduct(string productName, int supplierID, decimal price, DateTime createdAt, int stockQuantity, string imageFileName, int BrandID, int CategoryID)
+
+        public int AddProduct(string productName, int supplierID, decimal price, DateTime createdAt, int stockQuantity, string imageFileName, int brandID, int categoryID)
         {
-            string sql = @"
-        INSERT INTO Product (ProductName, SupplierID, ImportPrice, CreatedAt, StockQuantity, ImageUrl, BrandID, CategoryID)
-        VALUES (@ProductName, @SupplierID, @ImportPrice, @CreatedAt, @StockQuantity, @Img, @BrandID, @CategoryID);
-         ";
-
-            SqlParameter[] parameters = new SqlParameter[]
+            try
             {
-                new SqlParameter("@ProductName", SqlDbType.NVarChar) { Value = productName },
-                new SqlParameter("@SupplierID", SqlDbType.Int) { Value = supplierID },
-                new SqlParameter("@ImportPrice", SqlDbType.Decimal) { Value = price }, // Tham số giá nhập
-                new SqlParameter("@CreatedAt", SqlDbType.DateTime) { Value = createdAt },
-                new SqlParameter("@StockQuantity", SqlDbType.Int) { Value = stockQuantity },
-                new SqlParameter("@Img", imageFileName) ,// Chỉ lưu tên file hình ảnh vào CSDL
-                new SqlParameter("@BrandID", SqlDbType.Int) { Value = BrandID },
-                new SqlParameter("@CategoryID", SqlDbType.Int) { Value = CategoryID },
+                // SQL kiểm tra sản phẩm đã tồn tại
+                string sqlCheckExist = @"
+                SELECT COUNT(*) 
+                FROM Product 
+                WHERE ProductName = @ProductName AND SupplierID = @SupplierID 
+                  AND CategoryID = @CategoryID AND BrandID = @BrandID";
 
-            };
+                // SQL cập nhật sản phẩm nếu đã tồn tại
+                string sqlUpdate = @"
+                UPDATE Product 
+                SET ImportPrice = @ImportPrice, 
+                    StockQuantity = StockQuantity + @StockQuantity ,
+                    Price = 0,
+                    ProfitMargin = 0,
+                    Profit=0
 
-            return DataProvider.JustExcuteWithParameter(sql, parameters);
+                WHERE ProductName = @ProductName AND SupplierID = @SupplierID 
+                  AND CategoryID = @CategoryID AND BrandID = @BrandID";
+
+                // SQL thêm mới sản phẩm
+                string sqlInsert = @"
+                INSERT INTO Product (ProductName, SupplierID, ImportPrice, CreatedAt, StockQuantity, ImageUrl, BrandID, CategoryID) 
+                VALUES (@ProductName, @SupplierID, @ImportPrice, @CreatedAt, @StockQuantity, @Img, @BrandID, @CategoryID)";
+
+                // Tạo mảng tham số dùng chung
+                SqlParameter[] parameters = new SqlParameter[]
+                {
+            new SqlParameter("@ProductName", SqlDbType.NVarChar) { Value = productName },
+            new SqlParameter("@SupplierID", SqlDbType.Int) { Value = supplierID },
+            new SqlParameter("@ImportPrice", SqlDbType.Decimal) { Value = price },
+            new SqlParameter("@CreatedAt", SqlDbType.DateTime) { Value = createdAt },
+            new SqlParameter("@StockQuantity", SqlDbType.Int) { Value = stockQuantity },
+            new SqlParameter("@Img", SqlDbType.NVarChar) { Value = imageFileName },
+            new SqlParameter("@BrandID", SqlDbType.Int) { Value = brandID },
+            new SqlParameter("@CategoryID", SqlDbType.Int) { Value = categoryID }
+                };
+
+                // Kiểm tra sản phẩm đã tồn tại chưa
+                int count = Convert.ToInt32(DataProvider.ExecuteScalar(sqlCheckExist, parameters));
+
+                if (count > 0)
+                {
+                    // Tạo mảng tham số mới để cập nhật (không dùng lại tham số cũ)
+                    SqlParameter[] updateParams = parameters.Select(p => new SqlParameter(p.ParameterName, p.SqlDbType) { Value = p.Value }).ToArray();
+                    MessageBox.Show("CapNhatSP");
+                    return DataProvider.JustExcuteWithParameter(sqlUpdate, updateParams);
+                }
+                else
+                {
+                    // Tạo mảng tham số mới để thêm mới
+                    SqlParameter[] insertParams = parameters.Select(p => new SqlParameter(p.ParameterName, p.SqlDbType) { Value = p.Value }).ToArray();
+                    MessageBox.Show("ThemMoiSP");
+
+                    return DataProvider.JustExcuteWithParameter(sqlInsert, insertParams);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi
+                //MessageBox.Show($"Lỗi xảy ra: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return 0;
+            }
         }
+
 
         // update lại status
         public bool UpdateProductStatus(int productId, int newStatus)
@@ -138,29 +184,29 @@ namespace DAL
         {
             try
             {
-                string sql = "SELECT BrandName FROM [WatchStore].[dbo].[Brand] WHERE BrandID = @BrandID";
+                string sql = "SELECT BrandName FROM [Brand] WHERE BrandID = @BrandID";
 
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-           new SqlParameter("@BrandID", SqlDbType.Int) { Value = brandID }
+                new SqlParameter("@BrandID", SqlDbType.Int) { Value = brandID }
                 };
 
                 DataTable dt = DataProvider.GetTableWithParameters(sql, parameters);
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    return dt.Rows[0]["BrandName"].ToString(); // Trả về tên thương hiệu
+                    return dt.Rows[0]["BrandName"].ToString();
                 }
                 else
                 {
-                    return "Không tìm thấy thương hiệu"; // Nếu không tìm thấy
+                    return "Không tìm thấy thương hiệu";
                 }
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi chi tiết hơn để dễ debug
+
                 Console.WriteLine("Lỗi khi truy vấn dữ liệu DL: " + ex.Message);
-                return null; // Trả về null nếu có lỗi
+                return null;
             }
         }
 
@@ -169,33 +215,32 @@ namespace DAL
         {
             try
             {
-                // Câu lệnh SQL để truy vấn tên danh mục theo CategoryID
-                string sql = "SELECT CategoryName FROM [WatchStore].[dbo].[Category] WHERE CategoryID = @CategoryID";
 
-                // Khởi tạo tham số truyền vào câu lệnh SQL
+                string sql = "SELECT CategoryName FROM [Category] WHERE CategoryID = @CategoryID";
+
+
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-       new SqlParameter("@CategoryID", SqlDbType.Int) { Value = categoryID }
+            new SqlParameter("@CategoryID", SqlDbType.Int) { Value = categoryID }
                 };
 
-                // Lấy dữ liệu từ cơ sở dữ liệu
+
                 DataTable dt = DataProvider.GetTableWithParameters(sql, parameters);
 
-                // Kiểm tra nếu dữ liệu trả về không rỗng
+
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    return dt.Rows[0]["CategoryName"].ToString(); // Trả về tên danh mục
+                    return dt.Rows[0]["CategoryName"].ToString();
                 }
                 else
                 {
-                    return "Không tìm thấy danh mục"; // Nếu không tìm thấy danh mục
+                    return "Không tìm thấy danh mục";
                 }
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi chi tiết hơn để dễ debug
                 Console.WriteLine("Lỗi khi truy vấn dữ liệu DL: " + ex.Message);
-                return null; // Trả về null nếu có lỗi
+                return null;
             }
         }
         // ncc
@@ -203,34 +248,35 @@ namespace DAL
         {
             try
             {
-                // Câu lệnh SQL để truy vấn tên nhà cung cấp theo SupplierID
-                string sql = "SELECT ContactName FROM [WatchStore].[dbo].[Supplier] WHERE SupplierID = @SupplierID";
 
-                // Khởi tạo tham số truyền vào câu lệnh SQL
+                string sql = "SELECT ContactName FROM [dbo].[Supplier] WHERE SupplierID = @SupplierID";
+
+
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-                   new SqlParameter("@SupplierID", SqlDbType.Int) { Value = supplierID }
+                  new SqlParameter("@SupplierID", SqlDbType.Int) { Value = supplierID }
                 };
 
-                // Lấy dữ liệu từ cơ sở dữ liệu
+
                 DataTable dt = DataProvider.GetTableWithParameters(sql, parameters);
-                // Kiểm tra nếu dữ liệu trả về không rỗng
+
+
                 if (dt != null && dt.Rows.Count > 0)
                 {
-                    return dt.Rows[0]["ContactName"].ToString(); // Trả về tên nhà cung cấp
+                    return dt.Rows[0]["ContactName"].ToString();
                 }
                 else
                 {
-                    return "Không tìm thấy nhà cung cấp"; // Nếu không tìm thấy nhà cung cấp
+                    return "Không tìm thấy nhà cung cấp";
                 }
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi chi tiết hơn để dễ debug
                 Console.WriteLine("Lỗi khi truy vấn dữ liệu DL: " + ex.Message);
-                return null; // Trả về null nếu có lỗi
+                return null;
             }
         }
+
 
         // xoa ncc
         public bool UpdateSupplierRemove(int SupplierID, int check_Remove)
@@ -265,7 +311,7 @@ namespace DAL
             WHERE SupplierID = @SupplierID;
               ";
 
-                // Tạo các tham số SQL
+
                 SqlParameter[] parameters = new SqlParameter[]
                 {
                     new SqlParameter("@SupplierID", SqlDbType.Int) { Value = SupplierID },
@@ -275,17 +321,17 @@ namespace DAL
                     new SqlParameter("@Address", SqlDbType.NVarChar, 255) { Value = Address },
                 };
 
-                // Thực thi câu lệnh SQL
+
                 int result = DataProvider.JustExcuteWithParameter(sql, parameters);
 
-                // Kiểm tra kết quả
-                return result > 0; // Nếu có bản ghi bị ảnh hưởng thì trả về true
+
+                return result > 0;
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi
-                Console.WriteLine("Lỗi khi cập nhật nhà cung cấp: " + ex.Message);
-                return false; // Nếu có lỗi thì trả về false
+                MessageBox.Show("Lỗi khi cập nhật nhà cung cấp: " + ex.Message);
+                //Console.WriteLine("Lỗi khi cập nhật nhà cung cấp: " + ex.Message);
+                return false;
             }
         }
         // add ncc
@@ -293,53 +339,49 @@ namespace DAL
         {
             try
             {
-                // Kiểm tra nếu email đã tồn tại trong cơ sở dữ liệu
+
                 string checkEmailSql = "SELECT COUNT(*) FROM Supplier WHERE Email = @Email";
                 SqlParameter[] checkEmailParams = new SqlParameter[]
                 {
-            new SqlParameter("@Email", SqlDbType.NVarChar, 100) { Value = Email }
+                  new SqlParameter("@Email", SqlDbType.NVarChar, 100) { Value = Email }
                 };
 
-                // Sử dụng phương thức ExecuteScalar để kiểm tra số lượng email trùng
+
                 int emailCount = Convert.ToInt32(DataProvider.ExecuteScalar(checkEmailSql, checkEmailParams));
 
                 if (emailCount > 0)
                 {
                     // Nếu email đã tồn tại
-                    //MessageBox.Show("Email đã tồn tại trong hệ thống!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return false;
                 }
 
                 // Nếu email chưa tồn tại, thực hiện thêm nhà cung cấp mới
                 string sql = @"
-                    INSERT INTO Supplier (ContactName, Phone, Email, Address, CreatedAt)
-                    VALUES (@ContactName, @Phone, @Email, @Address, @CreatedAt);
+                    INSERT INTO Supplier (ContactName, Phone, Email, Address, CreatedAt, check_Remove)
+                    VALUES (@ContactName, @Phone, @Email, @Address, @CreatedAt, 1);
                     ";
 
-                // Lấy ngày hiện tại
                 DateTime currentDate = DateTime.Now;
 
-                // Tạo các tham số SQL
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-            new SqlParameter("@ContactName", SqlDbType.NVarChar, 100) { Value = ContactName },
-            new SqlParameter("@Phone", SqlDbType.NVarChar, 20) { Value = Phone },
-            new SqlParameter("@Email", SqlDbType.NVarChar, 100) { Value = Email },
-            new SqlParameter("@Address", SqlDbType.NVarChar, 255) { Value = Address },
-            new SqlParameter("@CreatedAt", SqlDbType.DateTime) { Value = currentDate } // Thêm ngày tạo
+                    new SqlParameter("@ContactName", SqlDbType.NVarChar, 100) { Value = ContactName },
+                    new SqlParameter("@Phone", SqlDbType.NVarChar, 20) { Value = Phone },
+                    new SqlParameter("@Email", SqlDbType.NVarChar, 100) { Value = Email },
+                    new SqlParameter("@Address", SqlDbType.NVarChar, 255) { Value = Address },
+                    new SqlParameter("@CreatedAt", SqlDbType.DateTime) { Value = currentDate }
                 };
 
-                // Thực thi câu lệnh SQL
                 int result = DataProvider.JustExcuteWithParameter(sql, parameters);
 
-                // Kiểm tra kết quả
-                return result > 0; // Nếu có bản ghi bị ảnh hưởng thì trả về true
+
+                return result > 0;
             }
             catch (Exception ex)
             {
-                // Xử lý lỗi
+
                 Console.WriteLine("Lỗi khi thêm nhà cung cấp: " + ex.Message);
-                return false; // Nếu có lỗi thì trả về false
+                return false;
             }
         }
         // find
@@ -348,52 +390,51 @@ namespace DAL
             try
             {
                 string sql = @"
-            INSERT INTO SupplierProduct (
-                SupplierID,
-                ProductName,
-                Price,
-                Status,
-                Quantity,
-            
-                Img,
-                CategoryID,
-                BrandID
-            ) VALUES (
-                @SupplierID,
-                @ProductName,
-                @Price,
-                @Status,
-                @Quantity,
-             
-                @Img,
-                @CategoryID,
-                @BrandID
-            )";
-                DateTime currentDate = DateTime.Now;
+        INSERT INTO SupplierProduct (
+            SupplierID,
+            ProductName,
+            Price,
+            Status,
+            Quantity,
+            Img,
+            CategoryID,
+            BrandID
+        ) VALUES (
+            @SupplierID,
+            @ProductName,
+            @Price,
+            @Status,
+            @Quantity,
+            @Img,
+            @CategoryID,
+            @BrandID
+        )";
+
                 SqlParameter[] parameters = new SqlParameter[]
                 {
-                    new SqlParameter("@SupplierID", SqlDbType.Int) { Value = supplierID },
-                    new SqlParameter("@ProductName", SqlDbType.NVarChar) { Value = productName },
-                    new SqlParameter("@Price", SqlDbType.Decimal) { Value = price },
-                    new SqlParameter("@Status", SqlDbType.Int) { Value = status },
-                    new SqlParameter("@Quantity", SqlDbType.Int) { Value = quantity },
-                    new SqlParameter("@CreatedAt", SqlDbType.DateTime) { Value = currentDate },
-                    new SqlParameter("@Img", SqlDbType.NVarChar) { Value = img ?? (object)DBNull.Value },
-                    new SqlParameter("@CategoryID", SqlDbType.Int) { Value = categoryID },
-                    new SqlParameter("@BrandID", SqlDbType.Int) { Value = brandID }
+            new SqlParameter("@SupplierID", SqlDbType.Int) { Value = supplierID },
+            new SqlParameter("@ProductName", SqlDbType.NVarChar) { Value = productName },
+            new SqlParameter("@Price", SqlDbType.Decimal) { Value = price },
+            new SqlParameter("@Status", SqlDbType.Int) { Value = status },
+            new SqlParameter("@Quantity", SqlDbType.Int) { Value = quantity },
+            new SqlParameter("@Img", SqlDbType.NVarChar) { Value = img ?? (object)DBNull.Value },
+            new SqlParameter("@CategoryID", SqlDbType.Int) { Value = categoryID },
+            new SqlParameter("@BrandID", SqlDbType.Int) { Value = brandID }
                 };
 
-                return DataProvider.JustExcuteWithParameter(sql, parameters);
+                Console.WriteLine("Executing SQL with parameters:");
+                foreach (var param in parameters)
+                {
+                    Console.WriteLine($"{param.ParameterName}: {param.Value}");
+                }
+
+                return DataProvider.JustExcuteWithParameter(sql, parameters); // Ensure this returns rows affected or a success code
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Lỗi khi thêm sản phẩm: " + ex.Message);
-                return -1; // Trả về -1 nếu có lỗi
+                Console.WriteLine("Error in AddSupplierProduct: " + ex.Message);
+                throw; // Optionally rethrow to handle higher up
             }
         }
-
-
-
-
     }
 }

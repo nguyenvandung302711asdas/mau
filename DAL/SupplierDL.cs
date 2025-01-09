@@ -9,8 +9,12 @@ using System.Threading.Tasks;
 using DTO;
 namespace DAL
 {
+
     public class SupplierDL
     {
+        public static int SelectedSupplierID { get; set; }
+
+
         private static SupplierDL Instance;
         public static SupplierDL GetInstance
         {

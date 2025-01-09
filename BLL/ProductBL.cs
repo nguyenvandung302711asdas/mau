@@ -88,5 +88,11 @@ namespace BusinessLogicLayer
         {
             return ProductDL.GetInstance.GetDoanhThuHomNay();
         }
+
+
+        public DataTable GetProductToPrint(int id)
+        {
+            return ProductDL.GetInstance.GetProductToPrint(id);
+        }
     }
 }

@@ -21,3 +21,7 @@ C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Pop3.dll
 C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.Smtp.dll
 C:\BTL_W\BLL\bin\Debug\ActiveUp.Net.WhoIs.dll
 C:\BTL_W\BLL\bin\Debug\System.Net.Mail.Abstractions.dll
+C:\BTL_W\BLL\bin\Debug\BouncyCastle.Cryptography.dll
+C:\BTL_W\BLL\bin\Debug\itextsharp.dll
+C:\BTL_W\BLL\bin\Debug\BouncyCastle.Cryptography.xml
+C:\BTL_W\BLL\bin\Debug\itextsharp.xml
